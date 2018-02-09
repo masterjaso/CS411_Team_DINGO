@@ -1,0 +1,36 @@
+extends layout
+
+block header
+  
+  
+
+block content
+  h1=message
+  form(action="/signup" method="post")
+    div
+      label Username:
+      input(type="text" name="username" placeholder="User Name" required)
+    div
+      label Password:
+      input(type="password" name="password" placeholder="Desired Password" id="password" required)
+    div
+      label Confirm Password:
+      input(type="password" name="confirm_password" placeholder="Confirm Password" id="confirm_password" required)
+    div
+      input(type="submit" value="Log In")
+
+block footer
+  script.
+    var password = document.getElementById("password");
+    var confirm_password = document.getElementById("confirm_password");
+    
+    function validatePassword(){
+      if(password.value != confirm_password.value) {
+        confirm_password.setCustomValidity("Passwords Don't Match");
+      } else {
+        confirm_password.setCustomValidity('');
+      }
+    }
+  
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
