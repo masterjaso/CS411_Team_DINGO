@@ -1,0 +1,9 @@
+EDUCATIONLEVELID	LEVELDESCRIPTION
+NONE	Less than high school diploma
+HIGH	High school diploma or equivalent
+SCND	Some college - no degree
+ASSC	Associate Degree
+BACH	Bachelor Degree
+MSTR	Master Degree
+DCTR	Doctoral or Professional Degree
+UNDT	Undetermined

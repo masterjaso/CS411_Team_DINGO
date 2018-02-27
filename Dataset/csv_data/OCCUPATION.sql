@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS OCCUPATION;
+CREATE TABLE `OCCUPATION` (
+   `OCC_CODE` varchar(7) NOT NULL,
+   `OCC_TITLE` varchar(200) DEFAULT NULL,
+   `EDUCATIONLEVELID` varchar(8) NOT NULL,
+   
+   PRIMARY KEY (`OCC_CODE`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ 
+ load data local infile '.\\Dataset\\csv_data\\OCCUPATION.csv' 
+ into TABLE OCCUPATION 
+ IGNORE 1 ROWS
