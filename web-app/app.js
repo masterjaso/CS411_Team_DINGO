@@ -148,7 +148,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', loggedIn, function(req, res, next){
   //Set flash message and clear buffer in any
   req.flashMsg = req.flash('msg').pop();
-
+  
+  req.dbOpt = options;
   //console.log(Object.keys(req));
   //console.log(req.session);
   //console.log(req.passport);
