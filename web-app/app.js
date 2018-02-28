@@ -13,6 +13,9 @@ var mysql = require('mysql2');
 var MySQLStore = require('express-mysql-session')(session);
 var flash = require('connect-flash');
 
+process.env.IP = require('./libs/addy');
+process.env.PORT = 8000;
+
 //Declare express application variable
 var app = express();
 
@@ -173,7 +176,7 @@ app.use(function(err, req, res, next) {
 
 //Start webserver listening on PORT/IP
 console.log('Starting server at:  ' + process.env.IP + ':' + process.env.PORT);
-app.listen(process.env.PORT, process.env.IP)
+app.listen(process.env.PORT, process.env.IP) 
 
 function loggedIn(req, res, next) {
     if (req.user) {
