@@ -13,6 +13,9 @@ var mysql = require('mysql2');
 var MySQLStore = require('express-mysql-session')(session);
 var flash = require('connect-flash');
 
+process.env.IP = require('./libs/addy');
+process.env.PORT = 8000;
+
 //Declare express application variable
 var app = express();
 
@@ -40,34 +43,53 @@ passport.deserializeUser(function(user, done) {
 passport.use(
   'signup',
   new LocalStrategy({
-    // by default, local strategy uses username and password, we will override with email
+    // by default, local strategy uses username and password
     usernameField : 'username',
     passwordField : 'password',
     passReqToCallback : true // allows us to pass back the entire request to the callback
   },
   function(req, username, password, done) {
-    // find a user whose email is the same as the forms email
+    // find a user who is the same as the forms
     // we are checking to see if the user trying to login already exists
-    db.query("SELECT * FROM users WHERE username = ?",[username], function(err, rows) {
-      if (err)
-        return done(err);
+    db.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows) {
+      if (err){ return done(err); }
+      
+      //If userID already exists alert user
       if (rows.length) {
         return done(null, false, req.flash('msg', 'That username is already taken.'));
-      } else {
+      } 
+      
+      else {
         // if there is no user with that username
-        // create the user
-        var newUserMysql = {
-          username: username,
-          password: bcrypt.hashSync(password, 10) // use the generateHash function in our user model
-        };
-
-        var insertQuery = "INSERT INTO users ( username, password ) values (?,?)";
-
-        db.query(insertQuery,[newUserMysql.username, newUserMysql.password],function(err, rows) {
+        // create the user and insert into database
+        var insertQuery = "INSERT INTO User ( userID, firstname, lastname, passwd, " +
+                                             "stateID, eduLevelID, OCC_CODE, companyEmp, " +
+                                             "salary, reg_date) values ?";
+        
+        //Capture registration date
+        var regDate = new Date()
+        regDate.setHours(0,0,0,0);
+        regDate = regDate.toISOString()
+        
+        //Setup new User Entry
+        var userEntry = [
+          [
+          req.body.username,
+          req.body.fname,
+          req.body.lname,
+          bcrypt.hashSync( req.body.password, 10),
+          req.body.state,
+          req.body.education,
+          req.body.job,
+          req.body.company,
+          parseInt( req.body.salary.replace(/[$,]+/g,"") ),
+          regDate,
+          ]
+        ];
+        
+        db.query(insertQuery,[userEntry],function(err, rows) {
           if(err) console.log('ERROR',err);
-          newUserMysql = rows.username;
-
-          return done(null, newUserMysql);
+          return done(null, req.body.username);
         });
       }
     });
@@ -77,17 +99,16 @@ passport.use(
 passport.use(
   'login',
   new LocalStrategy({
-    // by default, local strategy uses username and password, we will override with email
     usernameField : 'username',
     passwordField : 'password',
     passReqToCallback : true // allows us to pass back the entire request to the callback
   },
   function(req, username, password, done) { // callback with email and password from our form
-    db.query("SELECT * FROM users WHERE username = ?",[username], function(err, rows){
+    db.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows){
       if (err)
           return done(err);
       if (!rows.length) {
-          return done(null, false, req.flash('msg', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+          return done(null, false, req.flash('msg', 'Invalid signin, retry or go to signup to register!')); // req.flash is the way to set flashdata using connect-flash
       }
       
       // if the user is found but the password is wrong
@@ -127,9 +148,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('*', loggedIn, function(req, res, next){
   //Set flash message and clear buffer in any
   req.flashMsg = req.flash('msg').pop();
-
+  
+  req.dbOpt = options;
   //console.log(Object.keys(req));
-  console.log(req.session);
+  //console.log(req.session);
   //console.log(req.passport);
   next();
 });
@@ -173,7 +195,7 @@ app.use(function(err, req, res, next) {
 
 //Start webserver listening on PORT/IP
 console.log('Starting server at:  ' + process.env.IP + ':' + process.env.PORT);
-app.listen(process.env.PORT, process.env.IP)
+app.listen(process.env.PORT, process.env.IP) 
 
 function loggedIn(req, res, next) {
     if (req.user) {
