@@ -112,7 +112,7 @@ passport.use(
       }
       
       // if the user is found but the password is wrong
-      if (!bcrypt.compareSync(password, rows[0].password)){
+      if (!bcrypt.compareSync(password, rows[0].passwd)){
           
           return done(null, false, req.flash('msg', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
       }

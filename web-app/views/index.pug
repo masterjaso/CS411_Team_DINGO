@@ -3,4 +3,8 @@ extends layout
 block content
   h1= title
   p Welcome to #{title} 
-  p #{myData[0]}
+  p The list below displays the most popular occupations where the total number of employees is over 1 million!
+
+  ul
+     each element in occ
+        li= element 
