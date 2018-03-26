@@ -2,10 +2,13 @@ extends layout
 
 block header
   
-  
 block content
   h1=title
   p Welcome to the future location of Your Profile with Career Explorer!
   
+  ul
+    li= data[0].firstname
+    li= data[0].lastname
+    
 block footer
   
