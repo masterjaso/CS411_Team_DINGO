@@ -5,12 +5,12 @@ class Query{
 		this.db = mysql.createPool(options);
 	}
 	
-	async select(stmnt){
+	async select(stmnt, args){
 		var conn, res;
-		
+		console.log(args);
 		try{
 			conn = await this.db.getConnection();
-			res = await conn.execute(stmnt);
+			res = await conn.execute(stmnt, args);
 			conn.release();
 		}
 		catch(e){console.log(e);}

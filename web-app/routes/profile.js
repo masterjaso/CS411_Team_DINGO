@@ -8,8 +8,8 @@ router.get('/', async function(req, res, next){
     return;
   }
   
-  var profileData = await req.query.select('select * from User');
-  console.log(profileData);
+  var profileData = await req.query.select('select * from User where userID = ?', [req.user.userID]);
+  
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
     data: profileData
