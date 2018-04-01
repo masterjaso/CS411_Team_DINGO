@@ -7,7 +7,8 @@ class Query{
 	
 	async select(stmnt, args){
 		var conn, res;
-		console.log(args);
+    console.log('SQL STATEMENT:', stmnt);
+		console.log('SQL ARGS',args);
 		try{
 			conn = await this.db.getConnection();
 			res = await conn.execute(stmnt, args);
