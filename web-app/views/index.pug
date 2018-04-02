@@ -6,5 +6,35 @@ block content
   p The list below displays the most popular occupations where the total number of employees is over 1 million!
 
   ul
-     each element in occ
-        li= element 
+     each element in JSON.parse(occ)
+        li= element['OCC_TITLE']
+
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js')
+  canvas#bar-chart(width='800', height='450')
+  
+  script.
+    var myOcc = !{occ};
+    console.log(myOcc);
+    data = myOcc.slice(0,4)
+    console.log(data);
+    
+    new Chart(document.getElementById("bar-chart"), {
+      type: 'bar',
+      data: {
+        labels: [data[0]['OCC_TITLE'], data[1]['OCC_TITLE'], data[2]['OCC_TITLE'], data[3]['OCC_TITLE'],],
+        datasets: [
+          {
+            label: "Employed",
+            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+            data: [data[0]['TOT_EMP'], data[1]['TOT_EMP'], data[2]['TOT_EMP'], data[3]['TOT_EMP']]
+          }
+        ]
+      },
+      options: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: 'Jobs with more than 1-million'
+        }
+      }
+    });
