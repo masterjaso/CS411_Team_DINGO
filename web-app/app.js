@@ -22,12 +22,12 @@ var app = express();
 
 //Setup application database
 var options = {
-    connectionLimit: 10,
-    host: 'localhost',
-    port: 3306,
-    user: 'dingosql',
-    password: 'dingopass',
-    database: 'dingo'
+  connectionLimit: 10,
+  host: 'sp18-cs411-dso-009.cs.illinois.edu',
+  port: 3306,
+  user: 'remote',
+  password: 'dingo1',
+  database: 'dingo'
 };
 var db = mysql.createPool(options);
 var queryRunner = new Query(options);
@@ -102,6 +102,40 @@ passport.use(
   })
 );
 
+
+// update the values from profile
+passport.use(
+  'update',
+  new LocalStrategy({
+    // by default, local strategy uses username and password
+    usernameField : 'username',
+    passwordField : 'password',
+    stateField : 'state',
+    passReqToCallback : true // allows us to pass back the entire request to the callback
+  },
+  function(req, username, password, state, done) {
+    // find a user who is the same as the forms
+    // we are checking to see if the user trying to login already exists
+    db.getConnection(function(err, conn) {
+      conn.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows) {
+        conn.release();
+        if (err){ return done(err); }
+        
+        else {
+          // update state
+          var insertQuery = "INSERT INTO User ( stateID, " + "state" + ") values ? WHERE userID = ?, [username], AND passwd = ?, [password]";
+          
+          db.query(insertQuery,[userEntry],function(err, rows) {
+            if(err) console.log('ERROR',err);
+            return done(null, req.body.username);
+          });
+        }
+      });
+    });
+  })
+);
+
+
 passport.use(
   'login',
   new LocalStrategy({
@@ -172,12 +206,14 @@ var index = require('./routes/index');
 var profile = require('./routes/profile');
 var login = require('./routes/login');
 var signup = require('./routes/signup');
+var update = require('./routes/update');
 
 //Invoke routes
 app.use('/', index);
 app.use('/profile', profile);
 app.use('/login', login);
 app.use('/signup', signup);
+app.use('/update', update);
 
 //Logout function
 app.get('/logout', function(req, res){

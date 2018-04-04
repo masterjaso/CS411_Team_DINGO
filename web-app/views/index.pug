@@ -3,11 +3,10 @@ extends layout
 block content
   h1= title
   p Welcome to #{title} 
-  p The list below displays the most popular occupations where the total number of employees is over 1 million!
 
-  ul
-     each element in JSON.parse(occ)
-        li= element['OCC_TITLE']
+  //ul
+  //   each element in JSON.parse(occ)
+  //      li= element['OCC_TITLE']
 
   script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js')
   canvas#bar-chart(width='800', height='450')
@@ -34,7 +33,7 @@ block content
         legend: { display: false },
         title: {
           display: true,
-          text: 'Jobs with more than 1-million'
+          text: 'Jobs with more than 1-million employees'
         }
       }
     });
