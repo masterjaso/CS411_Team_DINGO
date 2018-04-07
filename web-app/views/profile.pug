@@ -45,7 +45,7 @@ block header
     }
     }
     .responsive-table {
-    width: 80%;
+    width: 50%;
     margin-bottom: 1.5em;
     }
     @media (min-width: 48em) {
@@ -232,43 +232,38 @@ block content
         caption Your Current Career Profile
         thead
           tr
-            th(scope='col') #{data[0].firstname}
-            th(scope='col') #{data[0].lastname}
-            th(scope='col') Blank
+            th(data-title='Studio') Profile
+            th(data-title='Studio') Data
 
         tbody
           tr
-            th(scope='row') Current State
+            th(data-title='Studio') First Name
+            td(data-title='Studio') #{data[0].firstname}
+          tr
+            th(data-title='Studio') Last Name
+            td(data-title='Studio') #{data[0].lastname}
+          tr
+            th(data-title='Studio') Current State
             td(data-title='Studio') #{userStateID[0].stateID}
-            td
-              form( action="/update" method="post")
-                select#state.form-control(type="text" name="state"  required)
-                  option(value='')
-                  each val, key in state
-                    option(value=key) #{val}
-                div.form-row
-                  div.form-group.col-md-6
-                    br
-                    button.btn.btn-primary.col-md-6(type="submit") Submit
           tr
-            th(scope='row') Current Occupation
-            td(data-title='Worldwide Gross') #{currentOCC[0].OCC_TITLE}
-            td
-                form(name='f1', action='#')
-                    input#edit(type='submit', name='edit', color='blue', value='Update')
+            th(data-title='Studio') Current Occupation
+            td(data-title='Studio') #{currentOCC[0].OCC_TITLE}
           tr
-            th(scope='row') Current Employer
+            th(data-title='Studio') Current Employer
             td(data-title='Studio') #{currentEMP[0].companyEmp}
-            td 
-                form(name='f1', action='#')
-                    input#edit(type='submit', name='edit', color='blue', value='Update')
-          tr
-            th(scope='row') Current Salary	
-            td(data-title='salary', data-type='currency') #{currentSalary[0].salary}
-            td
-                form(name='f1', action='#')
-                    input#edit(type='submit', name='edit', color='blue', value='Update')
 
+          tr
+            th(data-title='Studio') Current Salary	
+            td(data-title='Studio', data-type='currency') #{currentSalary[0].salary}
+    
+  //Update profile
+  div
+    form( action="/update" method="post")
+    div.form-row
+      div.form-group.col-md-6
+          br
+          button.btn.btn-primary.col-md-6(type="submit") Update Profile
+  p.
     
   script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
           

@@ -52,8 +52,8 @@ router.get('/', async function(req, res, next){
 });
 
 router.post('/', 
-  passport.authenticate('signup', {
-		successRedirect : '/profile', // redirect to the secure profile section
+  passport.authenticate('update', {
+		successRedirect : '/signup', // redirect to the secure profile section
 		failureRedirect : '/signup', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
   })

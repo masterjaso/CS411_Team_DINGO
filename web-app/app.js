@@ -107,10 +107,6 @@ passport.use(
 passport.use(
   'update',
   new LocalStrategy({
-    // by default, local strategy uses username and password
-    usernameField : 'username',
-    passwordField : 'password',
-    stateField : 'state',
     passReqToCallback : true // allows us to pass back the entire request to the callback
   },
   function(req, username, password, state, done) {
