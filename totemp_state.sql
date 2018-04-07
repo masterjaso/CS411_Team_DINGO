@@ -1,0 +1,4 @@
+Select sum(TOT_EMP),S1.STATENAME,OS.STATE_ID from OCC_STATS OS,STATE S1 where
+S1.STATE_ID = OS.STATE_ID and 
+ OCC_TITLE <> 'All Occupations' group by STATE_ID,YEAR_ID
+
