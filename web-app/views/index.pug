@@ -45,7 +45,9 @@ block content
   p
   br
   br
-  p(class="text-center") The following chart illustrates the most popular occupations with more than 1 million employees
+  p The following chart illustrates the most popular occupations with more than 1 million employees
+  br
+  br
 
 
   canvas#bar-chart(width='800', height='450')
@@ -53,7 +55,7 @@ block content
   script.
       var myOcc = !{occ};
       console.log(myOcc);
-      data = myOcc.slice(0,4)
+      data = myOcc.slice(0,4);
       console.log(data);
       
       new Chart(document.getElementById("bar-chart"), {
@@ -76,5 +78,33 @@ block content
           }
         }
       });
-    
+  
+  p NEw chart
+  br
+  br
+  p
+  canvas#pie-chart(width='800', height='450')
 
+  script.
+      var myStates = !{states};
+      console.log(myStates);
+      data = myStates;
+      console.log(data);
+
+      new Chart(document.getElementById("pie-chart"), {
+        type: 'pie',
+        data: {
+          labels: "States",
+          datasets: [{
+            label: "Population (millions)",
+            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+            data: [data[0]['SUM'], data[1]['SUM'], data[2]['SUM'], data[3]['SUM'], data[4]['SUM'], data[5]['SUM'], data[6]['SUM'], data[7]['SUM'], data[8]['SUM'], data[9]['SUM'], data[10]['SUM']]
+          }]
+        },
+        options: {
+          title: {
+            display: true,
+            text: 'Predicted world population (millions) in 2050'
+          }
+        }
+      });
