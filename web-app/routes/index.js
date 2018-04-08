@@ -37,8 +37,9 @@ router.get('/', async function(req, res, next) {
     conn = await mysql.createConnection(req.dbOpt);
     
     //Get Occupation List
-    let [rows, fields] = await conn.execute("SELECT DISTINCT STATENAME, sum(TOT_EMP) as SUM from dingo.STATE S1, dingo.OCC_STATS OS WHERE " +
-                                " S1.STATE_ID = OS.STATE_ID AND OCC_TITLE <> 'All Occupations' group by YEAR_ID;", states);
+    let [rows, fields] = await conn.execute("SELECT  S2.YEAR_ID, S1.STATENAME, S2.STATE_ID, sum(TOT_EMP) as SUM from OCC_STATS S2, STATE S1 " +
+                                            "WHERE S1.STATE_ID = S2.STATE_ID AND " +
+                                            "OCC_TITLE <> 'All Occupations' group by STATE_ID,YEAR_ID LIMIT 20;", states);
      
     
     d = rows;
@@ -47,8 +48,11 @@ router.get('/', async function(req, res, next) {
   
   catch(e){console.log(e);}
 
+  console.log(c);
   console.log(d);
-  res.render('index', { title: 'Career Explorer', occ : JSON.stringify(k), hpaid : JSON.stringify(c), states : JSON.stringify(d)});
+  res.render('index', { title: 'Career Explorer', occ : JSON.stringify(k), hpaid : JSON.stringify(c), states : JSON.stringify(d) });
+
+
 });
 
 module.exports = router;

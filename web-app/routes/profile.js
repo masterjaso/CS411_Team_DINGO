@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../app.js').passport;
 const mysql = require('mysql2/promise');
-const q = require('../libs/SQL-Queries');
+
 
 /* GET users listing. */
 router.get('/', async function(req, res, next){
@@ -29,8 +29,9 @@ router.get('/', async function(req, res, next){
   try{
     conn = await mysql.createConnection(req.dbOpt);
     
-    //Get Occupation List
-    let [rows, fields] = await conn.execute(q.OCC_LIST, []);
+    //Get User's Current State ID
+    let [rows, fields] = await conn.execute("SELECT * FROM dingo.OCCUPATION " +
+                              "WHERE OCC_CODE NOT LIKE '%-0000%';", []);
     
     k = rows;
     
@@ -39,7 +40,8 @@ router.get('/', async function(req, res, next){
     }
     
     //Get Education List
-    [rows, fields] = await conn.execute(q.EDU_LIST, []);
+    [rows, fields] = await conn.execute("SELECT * FROM dingo.EDUCATIONALLEVEL " +
+                              "WHERE EDUCATIONLEVELID <> 'UNDT';", []);
     
     k = rows;
     
@@ -48,7 +50,7 @@ router.get('/', async function(req, res, next){
     }
     
     //Get States List
-    [rows, fields] = await conn.execute(q.STATE_LIST, []);
+    [rows, fields] = await conn.execute("SELECT * FROM dingo.STATE;", []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
@@ -79,6 +81,7 @@ router.get('/', async function(req, res, next){
 });
 
 router.post('/', async function(req, res, next){
+  console.log(Object.keys(req));
   console.log('BODY:',req.body);
   
   let conn, k;
@@ -109,16 +112,36 @@ router.post('/', async function(req, res, next){
   ];
 
   
-  try{
+  try{ 
     conn = await mysql.createConnection(req.dbOpt);
-    //UPDATE User Record
-    let [rows, fields] = await conn.execute(q.UPDATE_USER, args);
     
-    k = rows;
+    var insertQuery = "INSERT INTO User ( firstname, lastname, " +
+                                               "stateID, OCC_CODE, eduLevelID, companyEmp, " +
+                                               "salary) values ?";
+    
+    //Setup new User Entry
+    var userEntry = [
+        [
+          req.body.fname,
+          req.body.lname,
+          req.body.state,
+          req.body.job,
+          req.body.education,
+          req.body.company,
+          parseInt( req.body.salary.replace(/[$,]+/g,"") ),
+          ]
+        ];
+              
+    conn.query(insertQuery,[userEntry],function(err, rows) {
+        if(err) console.log('ERROR',err);
+          return done(null, req.body.username);
+      });
+
+
     conn.end();
   }
   catch(e){console.log(e);}
-  
+
   res.redirect('/profile');
 });
 module.exports = router;
