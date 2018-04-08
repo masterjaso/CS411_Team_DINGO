@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../app.js').passport;
 const mysql = require('mysql2/promise');
-
+const q = require('../libs/SQL-Queries');
 
 /* GET users listing. */
 router.get('/', async function(req, res, next){
