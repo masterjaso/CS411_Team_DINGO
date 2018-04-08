@@ -1,20 +1,28 @@
 extends layout
 
+
 block content
+
+
   h1(class="text-center", style="color:#3e95cd")= title
-  p(class="text-center") Welcome to #{title}! 
-  p(class="text-center", style="font:georgia") CareerExporer provides an interactive display of the datasets from Bureau of Labor Statistics. Here you can view popular labor statistics, as well as create your own queries and charts.
-  p(class="text-center") For example, the following list and the chart below shows top 10 highest paid occupations:
-  ol
-     each element in JSON.parse(hpaid)
-        li= element['OCC_TITLE']
+  p(class="text-center", style="font-size:20px;font-weight:bold") Welcome to #{title}! 
+  br
+  div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
+    p CareerExporer provides an interactive display of the datasets from Bureau of Labor Statistics. Here you can view popular labor statistics, as well as create your own queries and charts.
+    p For example, the following list and the chart below shows top 10 highest paid occupations:
+    ol
+        each element in JSON.parse(hpaid)
+            li= element['OCC_TITLE']      
   p
   br
   br
 
   script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js')
 
+
+ 
   canvas#bar-chart-horizontal(width='800', height='450')
+
   script.
     var myHpaid = !{hpaid};
     console.log(myHpaid);
@@ -45,10 +53,9 @@ block content
   p
   br
   br
-  p The following chart illustrates the most popular occupations with more than 1 million employees
+  div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
+    p The following chart illustrates the most popular occupations with more than 1 million employees
   br
-  br
-
 
   canvas#bar-chart(width='800', height='450')
   
@@ -79,32 +86,60 @@ block content
         }
       });
   
-  p NEw chart
+  div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
+    p This line chart shows total employment in selected states over a period of 2014 - 2016. 
+    p Sign up to query other states!
   br
   br
-  p
-  canvas#pie-chart(width='800', height='450')
+  
+  canvas#line-chart(width='800', height='450')
 
   script.
-      var myStates = !{states};
-      console.log(myStates);
-      data = myStates;
-      console.log(data);
 
-      new Chart(document.getElementById("pie-chart"), {
-        type: 'pie',
-        data: {
-          labels: "States",
-          datasets: [{
-            label: "Population (millions)",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [data[0]['SUM'], data[1]['SUM'], data[2]['SUM'], data[3]['SUM'], data[4]['SUM'], data[5]['SUM'], data[6]['SUM'], data[7]['SUM'], data[8]['SUM'], data[9]['SUM'], data[10]['SUM']]
-          }]
-        },
-        options: {
-          title: {
-            display: true,
-            text: 'Predicted world population (millions) in 2050'
+    var myStates = !{states};
+
+    data = myStates;
+
+    new Chart(document.getElementById("line-chart"), {
+      type: 'line',
+      data: {
+        labels: [data[0]['YEAR_ID'], data[1]['YEAR_ID'], data[2]['YEAR_ID']],
+        datasets: [{ 
+            data: [data[0]['SUM'], data[1]['SUM'], data[2]['SUM']],
+            label: "Alaska",
+            borderColor: "#3e95cd",
+            fill: false
+          }, { 
+            data: [data[3]['SUM'], data[4]['SUM'], data[5]['SUM']],
+            label: "Alabama",
+            borderColor: "#8e5ea2",
+            fill: false
+          }, { 
+            data: [data[6]['SUM'], data[7]['SUM'], data[8]['SUM']],
+            label: "Arkansas",
+            borderColor: "#3cba9f",
+            fill: false
+          }, { 
+            data: [data[9]['SUM'], data[10]['SUM'], data[11]['SUM']],
+            label: "Arizona",
+            borderColor: "#e8c3b9",
+            fill: false
+          }, { 
+            data: [data[12]['SUM'], data[13]['SUM'], data[14]['SUM']],
+            label: "California",
+            borderColor: "#c45850",
+            fill: false
           }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'Employment timeline data in various states from 2014 - 2016 (in millions)'
         }
-      });
+      }
+    });
+
+  br
+  br
+  br
