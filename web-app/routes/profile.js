@@ -11,17 +11,14 @@ router.get('/', async function(req, res, next){
     return;
   }
   
-  var profileData = await req.query.select('select * from User where userID = ?', [req.user]);
+  var profileData = await req.query.select('select * from User where userID = ?', [req.user.userID]);
+  var userStateID = await req.query.select('select stateID from User where userID = ?', [req.user.userID]);
+  var currentOCC = await req.query.select('SELECT S2.OCC_TITLE FROM User S1, dingo.OCCUPATION S2 WHERE S1.userID =  ? ' +
+                                          'AND S1.OCC_CODE = S2.OCC_CODE', [req.user.userID]);
+  var currentEMP = await req.query.select('select companyEmp from User where userID = ?', [req.user.userID]);
+  var currentSalary = await req.query.select('select salary from User where userID = ?', [req.user.userID]);
+  var currentEdu = await req.query.select('select eduLevelID from User where userID = ?;', [req.user.userID]);
 
-  var userStateID = await req.query.select('select stateID from User where userID = ?', [req.user]);
-
-  var currentOCC = await req.query.select('SELECT S2.OCC_TITLE FROM User S1, dingo.OCCUPATION S2 WHERE S1.userID =  ?  AND S1.OCC_CODE = S2.OCC_CODE', [req.user]);
-
-  var currentEMP = await req.query.select('select companyEmp from User where userID = ?', [req.user]);
-
-  var currentSalary = await req.query.select('select salary from User where userID = ?', [req.user]);
-
-  console.log(currentOCC);
   let conn, k;
   let occ = {};
   let edu = {};
@@ -63,24 +60,23 @@ router.get('/', async function(req, res, next){
     conn.end();
   }
   catch(e){console.log(e);}
-  //console.log( occ );
-  //console.log( edu );
-  //console.log( state );
+  console.log( currentEdu );
+  console.log( edu );
 
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
-    data: profileData, userStateID, currentOCC, currentEMP, currentSalary,
+    data: profileData, userStateID:userStateID, currentOCC:currentOCC, 
+    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu,
     message: req.flashMsg, occ:occ, edu:edu, state:state
   });
 
   
 });
 
-router.post('/', 
-  passport.authenticate('/update', {
-		successRedirect : '/profile', // redirect to the secure profile section
-		failureRedirect : '/signup', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
-  })
-);
+router.post('/', async function(req, res, next){
+  console.log(Object.keys(req));
+  console.log('BODY:',req.body);
+  
+  res.redirect('/profile');
+});
 module.exports = router;

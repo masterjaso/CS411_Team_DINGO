@@ -102,36 +102,6 @@ passport.use(
   })
 );
 
-
-// update the values from profile
-passport.use(
-  'update',
-  new LocalStrategy({
-    passReqToCallback : true // allows us to pass back the entire request to the callback
-  },
-  function(req, username, password, state, done) {
-    // find a user who is the same as the forms
-    // we are checking to see if the user trying to login already exists
-    db.getConnection(function(err, conn) {
-      conn.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows) {
-        conn.release();
-        if (err){ return done(err); }
-        
-        else {
-          // update state
-          var insertQuery = "INSERT INTO User ( stateID, " + "state" + ") values ? WHERE userID = ?, [username], AND passwd = ?, [password]";
-          
-          db.query(insertQuery,[userEntry],function(err, rows) {
-            if(err) console.log('ERROR',err);
-            return done(null, req.body.username);
-          });
-        }
-      });
-    });
-  })
-);
-
-
 passport.use(
   'login',
   new LocalStrategy({
