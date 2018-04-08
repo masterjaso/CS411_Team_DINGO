@@ -227,65 +227,188 @@ block content
   
   h1=message
   
-  div
-    form(action="/explore" method="post")
-      .container
-        table.responsive-table
-          caption Data Explorer
-          thead
-            tr
-              th(data-title='Studio') Item
-              th(data-title='Studio') Entry
+  div.row
+    div.col-sm-6
+      form(action="/explore" method="post")
+        .container
+          table.responsive-table
+            caption Data Explorer
+            thead
+              tr
+                th(data-title='Studio') Item
+                th(data-title='Studio') Entry
 
-          tbody
-            tr
-              th(data-title='Studio') Data Set
-              td(data-title='Studio') 
-                input.form-control(type="text" name="dataset" value='')
-            tr
-              th(data-title='Studio') State
-              td(data-title='Studio') 
-                select.form-control(type="text" name="state")
-                  option(value='')
-                  each val, key in state
-                    option(value=key) #{val}
-            tr
-              th(data-title='Studio') Occupation
-              td(data-title='Studio')
-                select#occ.form-control(type="text" name="occ")
-                  option(value='')
-                  each val, key in occ
-                    option(value=key) #{val}
-            tr
-              th(data-title='Studio') Education
-              td(data-title='Studio')
-                select#occ.form-control(type="text" name="edu")
-                  option(value='')
-                  each val, key in edu
-                    option(value=key) #{val}
-            tr
-              th(data-title='Studio') Min Salary
-              td(data-title='Studio') 
-                input.form-control(type="text" name="min_sal" value='')
-            tr
-              th(data-title='Studio') Max Salary
-              td(data-title='Studio') 
-                input.form-control(type="text" name="max_sal" value='')
-          tfoot
-            tr
-              th(data-title='Studio')
-              td(data-title='Studio') 
-                button.btn.btn-primary.col-md-6(type="submit") Submit
+            tbody
+              tr
+                th(data-title='Studio') Data Set
+                td(data-title='Studio') 
+                  select#data_sel.form-control(type="text" name="data_set" required)
+                    option(value='')
+                    option(value='OCC_BY_STATE') Occupation List by State
+              tr
+                th(data-title='Studio') Year
+                td(data-title='Studio') 
+                  select#year.form-control(type="text" name="year")
+                    option(value='')
+                    option(value='2014') 2014
+                    option(value='2015') 2015
+                    option(value='2016') 2016
+              tr
+                th(data-title='Studio') State
+                td(data-title='Studio') 
+                  select#state.form-control(type="text" name="state")
+                    option(value='')
+                    each val, key in state
+                      option(value=key) #{val}
+              tr
+                th(data-title='Studio') Occupation
+                td(data-title='Studio')
+                  select#occ.form-control(type="text" name="occ")
+                    option(value='')
+                    each val, key in occ
+                      option(value=key) #{val}
+              tr
+                th(data-title='Studio') Education
+                td(data-title='Studio')
+                  select#edu.form-control(type="text" name="edu")
+                    option(value='')
+                    each val, key in edu
+                      option(value=key) #{val}
+              tr
+                th(data-title='Studio') Min Salary
+                td(data-title='Studio') 
+                  input#minsal.form-control(type="text" name="min_sal" value='')
+              tr
+                th(data-title='Studio') Max Salary
+                td(data-title='Studio') 
+                  input#maxsal.form-control(type="text" name="max_sal" value='')
+            tfoot
+              tr
+                th(data-title='Studio')
+                td(data-title='Studio') 
+                  button#subbtn.btn.btn-primary.col-md-6(type="submit") Submit
 
+    div.col-sm-6
+      #res.container
+    
 block footer
   script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
   script.
+    function clear_hide(obj){
+      o = obj[0];
+      o.value = '';
+      o.selected = '';
+      obj.hide();
+    }
+    
+    function setSelectedValue(selectObj, valueToSet) {
+      for (var i = 0; i < selectObj.options.length; i++) {
+        if (selectObj.options[i].value == valueToSet) {
+            selectObj.options[i].selected = true;
+            return;
+        }
+      }
+    }
+    
+    function makeTable(container, data) {
+      var table = $("<table/>").addClass('responsive-table');
+      var head = $("<thead>").append($("<tr>")).append($("<th>").text("Results"));
+      var body = $("<tbody/>");
+      table.append(head);
+      table.append(body);
+      $.each(data, function(rowIndex, r) {
+          var row = $("<tr/>");
+          $.each(r, function(colIndex, c) { 
+              row.append($("<td/>").text(c));
+          });
+          body.append(row);
+      });
+      return container.append(table);
+    }
+    
     $(document).ready(function(){
       var $form = $('form');
+      var $sel = $('#data_sel');
+      var $year = $('#year'); 
+      var $state = $('#state'); 
+      var $occ = $('#occ'); 
+      var $edu = $('#edu'); 
+      var $minsal = $('#minsal'); 
+      var $maxsal = $('#maxsal');
+      var $restbl = $('#restbl');
+      var $res = $('#res');
+      var $subbtn = $('#subbtn');
+      var qString;
+      
       $form.submit(function(){
+        $res.empty();
+        var params = $(this).serializeArray();
+        params.push({name:'fav', value:'fav'});
+        
+        console.log("HERE", params);
         $.post($(this).attr('action'), $(this).serialize(), function(response){
           console.log(response);
+          
+          var fav = $("<button/>").addClass('btn btn-primary col-md-6').text('Favorite');
+          fav.click( function(d){
+            $.ajax({
+              type: 'POST',
+              url: '/explore',
+              data: params,
+              success: function(r){console.log(r);},
+              dataType: 'json'
+            });
+            $(this).prop('disabled', true);
+          });
+          $res.append(fav);
+          
+          var ds = $sel[0].value;
+          
+          switch(ds){
+            case 'OCC_BY_STATE':
+              makeTable($res, response);
+              $restbl.show();
+              break;
+            default:
+              console.log('default', response);
+          }
         },'json');
         return false;
       });
+      
+      
+      $sel.change(function(){
+        var ds = this.value;
+        console.log('CHANGE:',ds);
+        
+        switch(ds){
+          case 'OCC_BY_STATE':
+            clear_hide($occ)
+            clear_hide($edu); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          default:
+            console.log('default');
+            $year.show(); 
+            $state.show(); 
+            $occ.show(); 
+            $edu.show(); 
+            $minsal.show(); 
+            $maxsal.show();
+        }
+      });
+      
+      if(location.search){
+        qString = JSON.parse( decodeURIComponent( location.search.split('=')[1] ) );
+        setSelectedValue($sel[0], qString.data_set);
+        setSelectedValue($year[0], qString.year);
+        setSelectedValue($state[0], qString.state);
+        setSelectedValue($occ[0], qString.occ);
+        setSelectedValue($edu[0], qString.edu);
+        $minsal[0].value = qString.minsal || '';
+        $maxsal[0].value = qString.maxsal || '';
+        
+        $subbtn[0].click();
+      }
     });

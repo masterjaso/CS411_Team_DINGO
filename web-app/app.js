@@ -160,7 +160,7 @@ app.use('*', loggedIn, function(req, res, next){
   
   req.dbOpt = options;
   req.pool = db;
-  req.query = queryRunner;
+  req.q = queryRunner;
   //console.log(Object.keys(req));
   //console.log(req.session);
   //console.log(req.passport);

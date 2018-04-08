@@ -11,18 +11,19 @@ router.get('/', async function(req, res, next){
     return;
   }
   
-  var profileData = await req.query.select('select * from User where userID = ?', [req.user.userID]);
-  var userStateID = await req.query.select('select stateID from User where userID = ?', [req.user.userID]);
-  var currentOCC = await req.query.select('SELECT S2.OCC_TITLE FROM User S1, dingo.OCCUPATION S2 WHERE S1.userID =  ? ' +
+  var profileData = await req.q.select('select * from User where userID = ?', [req.user.userID]);
+  var userStateID = await req.q.select('select stateID from User where userID = ?', [req.user.userID]);
+  var currentOCC = await req.q.select('SELECT S2.OCC_TITLE FROM User S1, dingo.OCCUPATION S2 WHERE S1.userID =  ? ' +
                                           'AND S1.OCC_CODE = S2.OCC_CODE', [req.user.userID]);
-  var currentEMP = await req.query.select('select companyEmp from User where userID = ?', [req.user.userID]);
-  var currentSalary = await req.query.select('select salary from User where userID = ?', [req.user.userID]);
-  var currentEdu = await req.query.select('select eduLevelID from User where userID = ?;', [req.user.userID]);
+  var currentEMP = await req.q.select('select companyEmp from User where userID = ?', [req.user.userID]);
+  var currentSalary = await req.q.select('select salary from User where userID = ?', [req.user.userID]);
+  var currentEdu = await req.q.select('select eduLevelID from User where userID = ?;', [req.user.userID]);
 
   let conn, k;
   let occ = {};
   let edu = {};
   let state = {};
+  let fav;
 
   
   try{
@@ -46,7 +47,6 @@ router.get('/', async function(req, res, next){
       edu[ k[i].EDUCATIONLEVELID ] = k[i].LEVELDESCRIPTION;
     }
     
-    
     //Get States List
     [rows, fields] = await conn.execute(q.STATE_LIST, []);
     k = rows;
@@ -55,17 +55,24 @@ router.get('/', async function(req, res, next){
       state[ k[i].STATE_ID ] = k[i].STATENAME;
     }
     
+    //Get Favorites List
+    [rows, fields] = await conn.execute(q.GET_FAV, [req.user.userID]);
+    fav = rows;
+    
+    for(var i = 0; i < fav.length; i++){
+      fav[i].queryData = JSON.parse(fav[i].queryData);
+    }
+    
     conn.end();
   }
   catch(e){console.log(e);}
-  console.log( currentEdu );
-  console.log( edu );
+  console.log( fav );
 
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
     data: profileData, userStateID:userStateID, currentOCC:currentOCC, 
     currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu,
-    message: req.flashMsg, occ:occ, edu:edu, state:state
+    message: req.flashMsg, occ:occ, edu:edu, state:state, fav:fav
   });
 
   
@@ -75,6 +82,21 @@ router.post('/', async function(req, res, next){
   console.log('BODY:',req.body);
   
   let conn, k;
+  //Handle favorite delete request
+  if(req.body.fav){
+    console.log('FAV HIT');
+    delete req.body['fav']
+    
+    try{
+      conn = await mysql.createConnection(req.dbOpt);
+      let [rows, fields] = await conn.execute(q.DEL_FAV, [req.body.favID]);
+      conn.end();
+    }
+    catch(e){console.log(e);}
+    res.json({data:'OK'});
+    return;
+  }
+  
   let args = [
     req.body.fname,
     req.body.lname,

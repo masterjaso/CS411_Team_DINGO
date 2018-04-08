@@ -228,68 +228,105 @@ block content
   
   h1=message
   
-  div
-    form( action="/profile" method="post")
+  div.row
+    div.col-sm-6
+      form( action="/profile" method="post")
+        .container
+          table.responsive-table
+            caption Your Current Career Profile
+            thead
+              tr
+                th(data-title='Studio') Profile
+                th(data-title='Studio') Data
+
+            tbody
+              tr
+                th(data-title='Studio') First Name
+                td(data-title='Studio') 
+                  input.form-control(type="text" name="fname" value=data[0].firstname)
+              tr
+                th(data-title='Studio') Last Name
+                td(data-title='Studio')
+                  input.form-control(type="text" name="lname" value=data[0].lastname)
+              tr
+                th(data-title='Studio') Current State
+                td(data-title='Studio') 
+                  select.form-control(type="text" name="state")
+                    each val, key in state
+                      if (key == data[0].stateID)
+                        option(value=key selected) #{val}
+                      else
+                        option(value=key) #{val}
+              tr
+                th(data-title='Studio') Current Occupation
+                td(data-title='Studio')
+                  select#occ.form-control(type="text" name="occ_title")
+                    each val, key in occ
+                      if (val == currentOCC[0].OCC_TITLE)
+                        option(value=key selected) #{val}
+                      else
+                        option(value=key) #{val}
+              tr
+                th(data-title='Studio') Current Education
+                td(data-title='Studio')
+                  select#occ.form-control(type="text" name="currentEdu")
+                    each val, key in edu
+                      if (key == currentEdu[0].eduLevelID)
+                        option(value=key selected) #{val}
+                      else
+                        option(value=key) #{val}
+              tr
+                th(data-title='Studio') Current Employer
+                td(data-title='Studio')
+                  input.form-control(type="text" name="companyEmp" value=currentEMP[0].companyEmp)
+              tr
+                th(data-title='Studio') Current Salary	
+                td(data-title='Studio', data-type='currency')
+                  input.form-control(type="text" name="salary" value=currentSalary[0].salary)
+        
+        div.form-row
+        div.form-group.col-md-6
+            br
+            button.btn.btn-primary.col-md-6(type="submit") Update Profile
+      
+    div.col-sm-6
       .container
         table.responsive-table
-          caption Your Current Career Profile
+          caption Your Favorites
           thead
             tr
-              th(data-title='Studio') Profile
-              th(data-title='Studio') Data
-
+              th(data-title='Studio') Data Set
+              th(data-title='Studio') Filters
+              th(data-title='Studio') Remove
           tbody
-            tr
-              th(data-title='Studio') First Name
-              td(data-title='Studio') 
-                input.form-control(type="text" name="fname" value=data[0].firstname)
-            tr
-              th(data-title='Studio') Last Name
-              td(data-title='Studio')
-                input.form-control(type="text" name="lname" value=data[0].lastname)
-            tr
-              th(data-title='Studio') Current State
-              td(data-title='Studio') 
-                select.form-control(type="text" name="state")
-                  each val, key in state
-                    if (key == data[0].stateID)
-                      option(value=key selected) #{val}
-                    else
-                      option(value=key) #{val}
-            tr
-              th(data-title='Studio') Current Occupation
-              td(data-title='Studio')
-                select#occ.form-control(type="text" name="occ_title")
-                  each val, key in occ
-                    if (val == currentOCC[0].OCC_TITLE)
-                      option(value=key selected) #{val}
-                    else
-                      option(value=key) #{val}
-            tr
-              th(data-title='Studio') Current Education
-              td(data-title='Studio')
-                select#occ.form-control(type="text" name="currentEdu")
-                  each val, key in edu
-                    if (key == currentEdu[0].eduLevelID)
-                      option(value=key selected) #{val}
-                    else
-                      option(value=key) #{val}
-            tr
-              th(data-title='Studio') Current Employer
-              td(data-title='Studio')
-                input.form-control(type="text" name="companyEmp" value=currentEMP[0].companyEmp)
-            tr
-              th(data-title='Studio') Current Salary	
-              td(data-title='Studio', data-type='currency')
-                input.form-control(type="text" name="salary" value=currentSalary[0].salary)
-      
-      div.form-row
-      div.form-group.col-md-6
-          br
-          button.btn.btn-primary.col-md-6(type="submit") Update Profile
-    
-  script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
-          
+            each row in fav
+              tr
+                td(data-title='Studio') 
+                  a(href="/explore?queryData="+JSON.stringify(row.queryData)) #{row.queryData.data_set}
+                td(data-title='Studio') #{JSON.stringify(row.queryData)}
+                td(data-title='Studio') 
+                  button.btn.btn-primary.delbtn(id="btn-"+row.favID type="submit") DELETE
 block footer
+  script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
+  
+  script.
+    $(document).ready(function(){
+      var $btns = $('.delbtn');
+      
+      $btns.click( function(d){
+        console.log(this.id.split('-')[1]);
+        var params = { favID:this.id.split('-')[1], fav:'fav'};
+        $.ajax({
+          type: 'POST',
+          url: '/profile',
+          data: params,
+          success: function(r){
+            console.log(r);
+            $(location).attr('href', '/profile')
+          },
+          dataType: 'json'
+        });
+      });
+    })
   
   
