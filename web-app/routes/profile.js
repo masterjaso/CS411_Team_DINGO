@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../app.js').passport;
 const mysql = require('mysql2/promise');
-
+const q = require('../libs/SQL-Queries');
 
 /* GET users listing. */
 router.get('/', async function(req, res, next){
@@ -28,9 +28,8 @@ router.get('/', async function(req, res, next){
   try{
     conn = await mysql.createConnection(req.dbOpt);
     
-    //Get User's Current State ID
-    let [rows, fields] = await conn.execute("SELECT * FROM dingo.OCCUPATION " +
-                              "WHERE OCC_CODE NOT LIKE '%-0000%';", []);
+    //Get Occupation List
+    let [rows, fields] = await conn.execute(q.OCC_LIST, []);
     
     k = rows;
     
@@ -39,8 +38,7 @@ router.get('/', async function(req, res, next){
     }
     
     //Get Education List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.EDUCATIONALLEVEL " +
-                              "WHERE EDUCATIONLEVELID <> 'UNDT';", []);
+    [rows, fields] = await conn.execute(q.EDU_LIST, []);
     
     k = rows;
     
@@ -50,7 +48,7 @@ router.get('/', async function(req, res, next){
     
     
     //Get States List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.STATE;", []);
+    [rows, fields] = await conn.execute(q.STATE_LIST, []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
@@ -74,8 +72,30 @@ router.get('/', async function(req, res, next){
 });
 
 router.post('/', async function(req, res, next){
-  console.log(Object.keys(req));
   console.log('BODY:',req.body);
+  
+  let conn, k;
+  let args = [
+    req.body.fname,
+    req.body.lname,
+    req.body.state,
+    req.body.currentEdu,
+    req.body.occ_title,
+    req.body.companyEmp,
+    req.body.salary,
+    req.user.userID
+  ];
+
+  
+  try{
+    conn = await mysql.createConnection(req.dbOpt);
+    //UPDATE User Record
+    let [rows, fields] = await conn.execute(q.UPDATE_USER, args);
+    
+    k = rows;
+    conn.end();
+  }
+  catch(e){console.log(e);}
   
   res.redirect('/profile');
 });

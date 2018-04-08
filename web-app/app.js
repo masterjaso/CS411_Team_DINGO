@@ -172,14 +172,14 @@ var index = require('./routes/index');
 var profile = require('./routes/profile');
 var login = require('./routes/login');
 var signup = require('./routes/signup');
-var update = require('./routes/update');
+var explore = require('./routes/explore');
 
 //Invoke routes
 app.use('/', index);
 app.use('/profile', profile);
 app.use('/login', login);
 app.use('/signup', signup);
-app.use('/update', update);
+app.use('/explore', explore);
 
 //Logout function
 app.get('/logout', function(req, res){

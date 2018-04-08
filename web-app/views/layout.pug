@@ -27,26 +27,20 @@ html(language='en')
         // Collect the nav links, forms, and other content for toggling
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav
-            li
-              a(href="/profile")
-                | Profile 
-                span.sr-only (current)
-            li
-              a(href="/signup") Signup
             li.dropdown
               a.dropdown-toggle(href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
                 | Menu 
                 span.caret
               ul.dropdown-menu
                 li
-                  a(href="#") Action
+                  a(href="/profile")
+                    | Profile 
+                    span.sr-only (current)
                 li
-                  a(href="#") Another action
-                li
-                  a(href="#") Something else here
+                  a(href="/explore") Explore
                 li.divider(role="separator")
                 li
-                  a(href="#") Separated link
+                  a(href="/signup") Signup
                 li.divider(role="separator")
                 li
                   a(href="/logout") Log Out
