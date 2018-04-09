@@ -29,10 +29,8 @@ router.get('/', async function(req, res, next){
   try{
     conn = await mysql.createConnection(req.dbOpt);
     
-    //Get User's Current State ID
-    let [rows, fields] = await conn.execute("SELECT * FROM dingo.OCCUPATION " +
-                              "WHERE OCC_CODE NOT LIKE '%-0000%';", []);
-    
+    //Get Occupation List
+    let [rows, fields] = await conn.execute(q.OCC_LIST, []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
@@ -40,9 +38,7 @@ router.get('/', async function(req, res, next){
     }
     
     //Get Education List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.EDUCATIONALLEVEL " +
-                              "WHERE EDUCATIONLEVELID <> 'UNDT';", []);
-    
+    [rows, fields] = await conn.execute(q.EDU_LIST, []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
@@ -50,7 +46,7 @@ router.get('/', async function(req, res, next){
     }
     
     //Get States List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.STATE;", []);
+    [rows, fields] = await conn.execute(q.STATE_LIST, []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
@@ -81,9 +77,7 @@ router.get('/', async function(req, res, next){
 });
 
 router.post('/', async function(req, res, next){
-  console.log(Object.keys(req));
-  console.log('BODY:',req.body);
-  
+  console.log('POST1');
   let conn, k;
   //Handle favorite delete request
   if(req.body.fav){
@@ -100,6 +94,7 @@ router.post('/', async function(req, res, next){
     return;
   }
   
+  console.log('POST2');
   let args = [
     req.body.fname,
     req.body.lname,
@@ -115,29 +110,11 @@ router.post('/', async function(req, res, next){
   try{ 
     conn = await mysql.createConnection(req.dbOpt);
     
-    var insertQuery = "INSERT INTO User ( firstname, lastname, " +
-                                               "stateID, OCC_CODE, eduLevelID, companyEmp, " +
-                                               "salary) values ?";
-    
+    //UPDATE User Record
+    let [rows, fields] = await conn.execute(q.UPDATE_USER, args);
+    k = rows;
     //Setup new User Entry
-    var userEntry = [
-        [
-          req.body.fname,
-          req.body.lname,
-          req.body.state,
-          req.body.job,
-          req.body.education,
-          req.body.company,
-          parseInt( req.body.salary.replace(/[$,]+/g,"") ),
-          ]
-        ];
-              
-    conn.query(insertQuery,[userEntry],function(err, rows) {
-        if(err) console.log('ERROR',err);
-          return done(null, req.body.username);
-      });
-
-
+    
     conn.end();
   }
   catch(e){console.log(e);}
