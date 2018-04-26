@@ -306,6 +306,57 @@ block content
                 td(data-title='Studio') #{JSON.stringify(row.queryData)}
                 td(data-title='Studio') 
                   button.btn.btn-primary.delbtn(id="btn-"+row.favID type="submit") DELETE
+
+  div.row
+    .container
+      table.responsive-table
+        caption Statistical Highlights for Your Occupation
+        thead
+          tr
+            th(data-title='Studio') Mean Salary (Nationwide)
+            th(data-title='Studio') Most Employed State
+            th(data-title='Studio') Educational Levels
+        tbody
+          each row in mean_sal
+            tr
+              td(data-title='Studio') #{row}
+              td(data-title='Studio') #{top_ten[0].STATE_ID}
+              td(data-title='Studio') #{edu_level[0]}
+
+  div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
+    p See below in which states your occupation of <strong>#{currentOCC[0].OCC_TITLE}</strong> is most popular! The below chart shows top ten states employed nationwide
+    br
+
+  canvas#bar-chart(width='800', height='450')
+    
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js')
+  script.
+      var top_ten = !{top_ten};
+
+      data = top_ten;
+
+
+      new Chart(document.getElementById("bar-chart"), {
+        type: 'bar',
+        data: {
+          labels: [data[0]['STATE_ID'], data[1]['STATE_ID'], data[2]['STATE_ID'], data[3]['STATE_ID'], data[4]['STATE_ID'], data[5]['STATE_ID'], data[6]['STATE_ID'],data[7]['STATE_ID'],data[8]['STATE_ID'],data[9]['STATE_ID']],
+          datasets: [
+            {
+              label: "Employed",
+              backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850", "#c99855", "#d99850", "#c22322", "#b45844", "#c49950" ],
+              data: [data[0]['TOT_EMP'], data[1]['TOT_EMP'], data[2]['TOT_EMP'], data[3]['TOT_EMP'], data[4]['TOT_EMP'], data[5]['TOT_EMP'], data[6]['TOT_EMP'], data[7]['TOT_EMP'], data[8]['TOT_EMP'], data[9]['TOT_EMP']],
+            }
+          ]
+        },
+        options: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Top Ten States with Highest Number of Employees for Your Occupation'
+          }
+        }
+      });
+
 block footer
   script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
   

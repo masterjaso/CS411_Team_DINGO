@@ -23,7 +23,14 @@ router.get('/', async function(req, res, next){
   let occ = {};
   let edu = {};
   let state = {};
+  let mean_sal = {};
+  let topTen = {};
+  let topTenStates = {};
+  let topTenEmp = {};
   let fav;
+  let sal;
+  let top_ten;
+  let edu_level;
 
   
   try{
@@ -61,14 +68,34 @@ router.get('/', async function(req, res, next){
       fav[i].queryData = JSON.parse(fav[i].queryData);
     }
     
+
+    // Get Mean salary for User's OCC
+    [rows, fields] = await conn.execute(q.MEAN_SALARY, [currentOCC[0]['OCC_TITLE']]);
+    sal = rows;
+    
+    for(var i = 0; i < sal.length; i++){
+      mean_sal[sal[i].AVG_MEAN]= JSON.parse(sal[i].AVG_MEAN);
+    }
+ 
+    // Get top ten employed states for user's OCC
+    [rows, fields] = await conn.execute(q.TOP_TEN_OCC, [currentOCC[0]['OCC_TITLE']]);
+    top_ten = rows;
+
+    // Get EDU levels
+    [rows, fields] = await conn.execute(q.EDU_LEVEL, [currentOCC[0]['OCC_TITLE']]);
+    edu_level = rows;
+
+
     conn.end();
   }
   catch(e){console.log(e);}
-  console.log( fav );
+  //console.log( fav );
+
+  console.log( top_ten );
 
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
-    data: profileData, userStateID:userStateID, currentOCC:currentOCC, 
+    data: profileData, userStateID:userStateID, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level,
     currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu,
     message: req.flashMsg, occ:occ, edu:edu, state:state, fav:fav
   });
