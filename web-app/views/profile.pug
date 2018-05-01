@@ -314,14 +314,16 @@ block content
         thead
           tr
             th(data-title='Studio') Mean Salary (Nationwide)
+            th(data-title='Studio') Mean Salary (Your Current State)
             th(data-title='Studio') Most Employed State
-            th(data-title='Studio') Educational Levels
+            th(data-title='Studio') Avg. Educational Level
         tbody
           each row in mean_sal
             tr
               td(data-title='Studio') #{row}
-              td(data-title='Studio') #{top_ten[0].STATE_ID}
-              td(data-title='Studio') #{edu_level[0]}
+              td(data-title='Studio') #{sal_state}
+              td(data-title='Studio') #{most_emp_state}
+              td(data-title='Studio') #{edu_level}
 
   div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
     p See below in which states your occupation of <strong>#{currentOCC[0].OCC_TITLE}</strong> is most popular! The below chart shows top ten states employed nationwide

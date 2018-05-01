@@ -13,6 +13,7 @@ router.get('/', async function(req, res, next){
   
   var profileData = await req.q.select('select * from User where userID = ?', [req.user.userID]);
   var userStateID = await req.q.select('select stateID from User where userID = ?', [req.user.userID]);
+ 
   var currentOCC = await req.q.select('SELECT S2.OCC_TITLE FROM User S1, dingo.OCCUPATION S2 WHERE S1.userID =  ? ' +
                                           'AND S1.OCC_CODE = S2.OCC_CODE', [req.user.userID]);
   var currentEMP = await req.q.select('select companyEmp from User where userID = ?', [req.user.userID]);
@@ -32,6 +33,10 @@ router.get('/', async function(req, res, next){
   let top_ten;
   let edu_level;
 
+  // Learning Variables
+
+  let sal_state; 
+  let sal_nation;
   
   try{
     conn = await mysql.createConnection(req.dbOpt);
@@ -69,9 +74,22 @@ router.get('/', async function(req, res, next){
     }
     
 
-    // Get Mean salary for User's OCC
+    // Get Mean salary for User's OCC Nationwide
     [rows, fields] = await conn.execute(q.MEAN_SALARY, [currentOCC[0]['OCC_TITLE']]);
     sal = rows;
+
+    // Get Median Total Salary per State
+    var result = userStateID.map(a => a.stateID);
+    console.log(result[0]);
+    console.log(currentOCC[0]['OCC_TITLE']);
+    [rows, fields] = await conn.execute(q.MEAN_STATE_SALARY, [result[0], currentOCC[0]['OCC_TITLE']]);
+    sal_state = rows;
+    console.log(sal_state);
+    sal_state = sal_state.map(a => a.AVG_STATE_MEAN);
+    console.log(sal_state);
+
+
+
     
     for(var i = 0; i < sal.length; i++){
       mean_sal[sal[i].AVG_MEAN]= JSON.parse(sal[i].AVG_MEAN);
@@ -81,9 +99,16 @@ router.get('/', async function(req, res, next){
     [rows, fields] = await conn.execute(q.TOP_TEN_OCC, [currentOCC[0]['OCC_TITLE']]);
     top_ten = rows;
 
+    // Most employed State
+    most_emp_state = top_ten[0]['STATE_ID'];
+    console.log(most_emp_state);
+
     // Get EDU levels
     [rows, fields] = await conn.execute(q.EDU_LEVEL, [currentOCC[0]['OCC_TITLE']]);
     edu_level = rows;
+    console.log(edu_level);
+    edu_level = edu_level.map(a => a.LEVELDESCRIPTION);
+    console.log(edu_level);
 
 
     conn.end();
@@ -95,8 +120,8 @@ router.get('/', async function(req, res, next){
 
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
-    data: profileData, userStateID:userStateID, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level,
-    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu,
+    data: profileData, userStateID:userStateID, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level, sal_state:sal_state,
+    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu, most_emp_state:most_emp_state,
     message: req.flashMsg, occ:occ, edu:edu, state:state, fav:fav
   });
 
