@@ -245,7 +245,9 @@ block content
                   select#data_sel.form-control(type="text" name="data_set" required)
                     option(value='')
                     option(value='OCC_BY_STATE') Occupation List by State
-                    option(value='DECLINE_JOBS') Declining jobs by year
+                    option(value='DECLINE_JOBS') Declining jobs by year (top 10)
+                    option(value='HIGHEST_PAID_YEAR') Highest Paid Job by State
+                    option(value='OCC_BY_EDU') Highest Paid Job by State and Education
               tr
                 th(data-title='Studio') Year
                 td(data-title='Studio') 
@@ -313,8 +315,13 @@ block footer
     
     function makeTable(container, data) {
       var table = $("<table/>").addClass('responsive-table');
-      var head = $("<thead>").append($("<tr>")).append($("<th>").text("Results"));
+      var head = $("<thead>").append($("<tr>"));
       var body = $("<tbody/>");
+      
+      $.each(Object.keys(data[0]), function(rowIndex, r) {
+        head.first().append($("<th>").addClass('text-center').text(r))
+      });
+      
       table.append(head);
       table.append(body);
       $.each(data, function(rowIndex, r) {
@@ -346,11 +353,10 @@ block footer
         var params = $(this).serializeArray();
         params.push({name:'fav', value:'fav'});
         
-        console.log("HERE", params);
         $.post($(this).attr('action'), $(this).serialize(), function(response){
           console.log(response);
           
-          var fav = $("<button/>").addClass('btn btn-primary col-md-6').text('Favorite');
+          var fav = $("<button/>").addClass('btn btn-primary').text('Favorite');
           fav.click( function(d){
             $.ajax({
               type: 'POST',
@@ -370,6 +376,18 @@ block footer
               makeTable($res, response);
               $restbl.show();
               break;
+            case 'DECLINE_JOBS':
+              makeTable($res, response);
+              $restbl.show();
+              break;
+            case 'HIGHEST_PAID_YEAR':
+              makeTable($res, response);
+              $restbl.show();
+              break;
+            case 'OCC_BY_EDU':
+              makeTable($res, response);
+              $restbl.show();
+              break;
             default:
               console.log('default', response);
           }
@@ -382,6 +400,14 @@ block footer
         var ds = this.value;
         console.log('CHANGE:',ds);
         
+        //Reset state of all sections
+        $year.show(); 
+        $state.show(); 
+        $occ.show(); 
+        $edu.show(); 
+        $minsal.show(); 
+        $maxsal.show();
+        
         switch(ds){
           case 'OCC_BY_STATE':
             clear_hide($occ)
@@ -393,6 +419,20 @@ block footer
             clear_hide($state)
             clear_hide($occ)			
             clear_hide($edu); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          case 'HIGHEST_PAID_YEAR':
+            clear_hide($state)
+            clear_hide($occ)			
+            clear_hide($edu); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          case 'OCC_BY_EDU':
+            clear_hide($state)
+            clear_hide($occ)			
+            clear_hide($year); 
             clear_hide($minsal); 
             clear_hide($maxsal);
             break;
@@ -420,4 +460,7 @@ block footer
         
         $subbtn[0].click();
       }
+      
+      //Trigger change event to set proper fields active
+      $sel.change();
     });

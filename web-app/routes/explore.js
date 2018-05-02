@@ -74,14 +74,8 @@ router.post('/', async function(req, res, next){
     
     try{
       conn = await mysql.createConnection(req.dbOpt);
-      switch(b.data_set){
-        case 'OCC_BY_STATE':
-          args = [req.user.userID, JSON.stringify(b)];
-          [rows, fields] = await conn.execute(q.ADD_FAV, args);
-          break;
-        default:
-          console.log('No Data Set Selected');
-      }
+      args = [req.user.userID, JSON.stringify(b)];
+      [rows, fields] = await conn.execute(q.ADD_FAV, args);//switch(b.data_set){
       conn.end();
     }
     catch(e){console.log(e);}
@@ -96,10 +90,24 @@ router.post('/', async function(req, res, next){
         args = [b.year, b.state];
         [rows, fields] = await conn.execute(q.OCC_BY_STATE, args);
         break;
+      case 'DECLINE_JOBS':
+        args = [b.year];
+        [rows, fields] = await conn.execute(q.DECLINE_JOBS, args);
+        rows = rows[0];  //Needs to dereference [0] to get actual rows
+        break;
+      case 'HIGHEST_PAID_YEAR':
+        args = [b.year];
+        [rows, fields] = await conn.execute(q.HIGHEST_PAID_YEAR, args);
+        break;
+      case 'OCC_BY_EDU':
+        args = [b.edu];
+        [rows, fields] = await conn.execute(q.OCC_BY_EDU, args);
+        console.log(b.edu);
+        break;
       default:
         console.log('No Data Set Selected');
     }
-
+    
     k = rows;
     conn.end();
   }
