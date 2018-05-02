@@ -245,6 +245,7 @@ block content
                   select#data_sel.form-control(type="text" name="data_set" required)
                     option(value='')
                     option(value='OCC_BY_STATE') Occupation List by State
+                    option(value='DECLINE_JOBS') Declining jobs by year
               tr
                 th(data-title='Studio') Year
                 td(data-title='Studio') 
@@ -388,6 +389,14 @@ block footer
             clear_hide($minsal); 
             clear_hide($maxsal);
             break;
+          case 'DECLINE_JOBS':
+            clear_hide($state)
+            clear_hide($occ)			
+            clear_hide($edu); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+			
           default:
             console.log('default');
             $year.show(); 
