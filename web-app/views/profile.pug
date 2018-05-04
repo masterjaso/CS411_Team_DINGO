@@ -313,17 +313,57 @@ block content
         caption Statistical Highlights for Your Occupation
         thead
           tr
+            th(data-title='Studio') 
             th(data-title='Studio') Mean Salary (Nationwide)
             th(data-title='Studio') Mean Salary (Your Current State)
             th(data-title='Studio') Most Employed State
             th(data-title='Studio') Avg. Educational Level
+            th(data-title='Studio') Total Employed (Your Current State)
+            th(data-title='Studio') Total Employed (Nationwide)
         tbody
           each row in mean_sal
             tr
+              td(data-title='Studio')
               td(data-title='Studio') #{row}
               td(data-title='Studio') #{sal_state}
               td(data-title='Studio') #{most_emp_state}
               td(data-title='Studio') #{edu_level}
+              td(data-title='Studio') #{tot_emp_state}
+              td(data-title='Studio') #{tot_emp_nation}
+            tr
+              td(data-title='Studio') Your Ranking
+
+  div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
+    p The occupation of <strong>#{currentOCC[0].OCC_TITLE}</strong> has the following distibution of educational levels:
+    br     
+
+  div.row
+    .container
+      table.responsive-table
+        caption Nationwide Employment Count of Your Occupation Based on Educaltional Levels
+        thead
+          tr
+            th(data-title='Studio') Educational Level
+            th(data-title='Studio') Degree Holders Count
+
+        tbody
+            tr
+              td(data-title='Studio') Doctoral or Professional Degree
+              td(data-title='Studio') #{doc_emp_sum}
+            tr
+              td(data-title='Studio') Master Degree
+              td(data-title='Studio') #{master_emp_sum}
+            tr
+              td(data-title='Studio') Bachelor Degree
+              td(data-title='Studio') #{bach_emp_sum}
+            tr
+              td(data-title='Studio') Associate Degree
+              td(data-title='Studio') #{associate_emp_sum}
+            tr
+              td(data-title='Studio') High School Diploma or Less
+              td(data-title='Studio') #{lower_emp_sum}
+
+
 
   div(style='background-color: rgb(255,249,230);padding: 1.0em;width: 80.0em;margin: 1.0em 0;border: solid 1.0px rgb(204,204,204);')
     p See below in which states your occupation of <strong>#{currentOCC[0].OCC_TITLE}</strong> is most popular! The below chart shows top ten states employed nationwide

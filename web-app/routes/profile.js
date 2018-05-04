@@ -88,9 +88,6 @@ router.get('/', async function(req, res, next){
     sal_state = sal_state.map(a => a.AVG_STATE_MEAN);
     console.log(sal_state);
 
-
-
-    
     for(var i = 0; i < sal.length; i++){
       mean_sal[sal[i].AVG_MEAN]= JSON.parse(sal[i].AVG_MEAN);
     }
@@ -99,6 +96,40 @@ router.get('/', async function(req, res, next){
     [rows, fields] = await conn.execute(q.TOP_TEN_OCC, [currentOCC[0]['OCC_TITLE']]);
     top_ten = rows;
 
+    // Get total employed in user's state and for his occupation
+    var result = userStateID.map(a => a.stateID);
+    [rows, fields] = await conn.execute(q.TOT_EMP_STATE, [currentOCC[0]['OCC_TITLE'], result[0]]);
+    tot_emp_state = rows[0]['TOT_EMP_STATE'];
+    console.log(tot_emp_state);
+
+    // Get total employed nationwide for user's occ
+    [rows, fields] = await conn.execute(q.TOT_EMP_NATION, [currentOCC[0]['OCC_TITLE']]);
+    tot_emp_nation = rows[0]['TOT_EMP_NATION'];
+    console.log(tot_emp_nation);
+
+    // DEGREE distribution for user's occupation
+    // ASSOCIATE
+    [rows, fields] = await conn.execute(q.DEGREE_DIST_ASSOSIATE, [currentOCC[0]['OCC_TITLE']]);
+    associate_emp_sum = rows[0]['EMP_SUM'];
+    console.log(associate_emp_sum);
+    // BACHELOR
+    [rows, fields] = await conn.execute(q.DEGREE_DIST_BACHELOR, [currentOCC[0]['OCC_TITLE']]);
+    bach_emp_sum = rows[0]['EMP_SUM'];
+    console.log(bach_emp_sum);
+    // MASTER
+    [rows, fields] = await conn.execute(q.DEGREE_DIST_MASTER, [currentOCC[0]['OCC_TITLE']]);
+    master_emp_sum = rows[0]['EMP_SUM'];
+    console.log(master_emp_sum);
+    // DOCTORAL
+    [rows, fields] = await conn.execute(q.DEGREE_DIST_DOCTORAL, [currentOCC[0]['OCC_TITLE']]);
+    doc_emp_sum = rows[0]['EMP_SUM'];
+    console.log(doc_emp_sum);
+    // HIGH SCHOOL OR LESS
+    [rows, fields] = await conn.execute(q.DEGREE_DIST_LOWER, [currentOCC[0]['OCC_TITLE']]);
+    lower_emp_sum = rows[0]['EMP_SUM'];
+    console.log(lower_emp_sum);
+
+
     // Most employed State
     most_emp_state = top_ten[0]['STATE_ID'];
     console.log(most_emp_state);
@@ -106,9 +137,9 @@ router.get('/', async function(req, res, next){
     // Get EDU levels
     [rows, fields] = await conn.execute(q.EDU_LEVEL, [currentOCC[0]['OCC_TITLE']]);
     edu_level = rows;
-    console.log(edu_level);
+    //console.log(edu_level);
     edu_level = edu_level.map(a => a.LEVELDESCRIPTION);
-    console.log(edu_level);
+    //console.log(edu_level);
 
 
     conn.end();
@@ -121,7 +152,8 @@ router.get('/', async function(req, res, next){
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
     data: profileData, userStateID:userStateID, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level, sal_state:sal_state,
-    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu, most_emp_state:most_emp_state,
+    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu, most_emp_state:most_emp_state, tot_emp_state:tot_emp_state, tot_emp_nation:tot_emp_nation, 
+    associate_emp_sum:associate_emp_sum, bach_emp_sum:bach_emp_sum, master_emp_sum:master_emp_sum, doc_emp_sum:doc_emp_sum, lower_emp_sum:lower_emp_sum,
     message: req.flashMsg, occ:occ, edu:edu, state:state, fav:fav
   });
 
