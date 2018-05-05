@@ -77,20 +77,24 @@ router.get('/', async function(req, res, next){
     // Get Mean salary for User's OCC Nationwide
     [rows, fields] = await conn.execute(q.MEAN_SALARY, [currentOCC[0]['OCC_TITLE']]);
     sal = rows;
+    mean_sal = sal.map(a => a.AVG_MEAN);
+
+    currentSal = currentSalary.map(a => a.salary);
+
 
     // Get Median Total Salary per State
     var result = userStateID.map(a => a.stateID);
-    console.log(result[0]);
-    console.log(currentOCC[0]['OCC_TITLE']);
+    var user_state = userStateID.map(a => a.stateID);
+    console.log("User state: " + user_state);
+    //console.log(result[0]);
+    //console.log(currentOCC[0]['OCC_TITLE']);
     [rows, fields] = await conn.execute(q.MEAN_STATE_SALARY, [result[0], currentOCC[0]['OCC_TITLE']]);
     sal_state = rows;
-    console.log(sal_state);
+   // console.log(sal_state);
     sal_state = sal_state.map(a => a.AVG_STATE_MEAN);
-    console.log(sal_state);
+    console.log("State salary " + sal_state);
 
-    for(var i = 0; i < sal.length; i++){
-      mean_sal[sal[i].AVG_MEAN]= JSON.parse(sal[i].AVG_MEAN);
-    }
+
  
     // Get top ten employed states for user's OCC
     [rows, fields] = await conn.execute(q.TOP_TEN_OCC, [currentOCC[0]['OCC_TITLE']]);
@@ -151,8 +155,8 @@ router.get('/', async function(req, res, next){
 
   res.render('profile', { 
     title: 'Career Explorer - Your Profile',
-    data: profileData, userStateID:userStateID, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level, sal_state:sal_state,
-    currentEMP:currentEMP, currentSalary:currentSalary, currentEdu:currentEdu, most_emp_state:most_emp_state, tot_emp_state:tot_emp_state, tot_emp_nation:tot_emp_nation, 
+    data: profileData, userStateID:userStateID, user_state:user_state, currentOCC:currentOCC, mean_sal:mean_sal, top_ten : JSON.stringify(top_ten), edu_level:edu_level, sal_state:sal_state,
+    currentEMP:currentEMP, currentSalary:currentSalary, currentSal:currentSal, currentEdu:currentEdu, most_emp_state:most_emp_state, tot_emp_state:tot_emp_state, tot_emp_nation:tot_emp_nation, 
     associate_emp_sum:associate_emp_sum, bach_emp_sum:bach_emp_sum, master_emp_sum:master_emp_sum, doc_emp_sum:doc_emp_sum, lower_emp_sum:lower_emp_sum,
     message: req.flashMsg, occ:occ, edu:edu, state:state, fav:fav
   });
