@@ -98,12 +98,12 @@ router.get('/', async function(req, res, next){
 
     // Get total employed in user's state and for his occupation
     var result = userStateID.map(a => a.stateID);
-    [rows, fields] = await conn.execute(q.TOT_EMP_STATE, [currentOCC[0]['OCC_TITLE'], result[0]]);
+    [rows, fields] = await conn.execute(q.TOT_EMP_STATE2, [currentOCC[0]['OCC_TITLE'], result[0]]);
     tot_emp_state = rows[0]['TOT_EMP_STATE'];
     console.log(tot_emp_state);
 
     // Get total employed nationwide for user's occ
-    [rows, fields] = await conn.execute(q.TOT_EMP_NATION, [currentOCC[0]['OCC_TITLE']]);
+    [rows, fields] = await conn.execute(q.TOT_EMP_NATION2, [currentOCC[0]['OCC_TITLE']]);
     tot_emp_nation = rows[0]['TOT_EMP_NATION'];
     console.log(tot_emp_nation);
 

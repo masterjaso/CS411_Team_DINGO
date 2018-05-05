@@ -216,6 +216,21 @@ block header
     }
     }
   script(src='https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js')
+  
+  style.
+    .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
 block content
   h1=title
@@ -241,10 +256,14 @@ block content
                 td(data-title='Studio') 
                   select#data_sel.form-control(type="text" name="data_set" required)
                     option(value='')
+                    option(value='TOT_EMP_NATION') Total Employement Nationwide
+                    option(value='TOT_EMP_STATE') Total Employement by State
                     option(value='OCC_BY_STATE') Occupation List by State
                     option(value='DECLINE_JOBS') Declining jobs by year (top 10)
                     option(value='HIGHEST_PAID_YEAR') Highest Paid Job by State
                     option(value='OCC_BY_EDU') Highest Paid Job by State and Education
+                    option(value='EMP_STATE_DIST') Employment Distribution by State
+                    option(value='DEGREE_DIST') Jobs by Degree
               tr
                 th(data-title='Studio') Year
                 td(data-title='Studio') 
@@ -288,6 +307,7 @@ block content
                 td(data-title='Studio') 
                   button#subbtn.btn.btn-primary.col-md-6(type="submit") Submit
 
+    div#loader.loader(hidden)
     div#res.container
     
     
@@ -359,14 +379,22 @@ block footer
       var qString;
       
       $form.submit(function(){
+        $('#loader').show();
         $res.empty();
+        $('#favbtn').remove();
         var params = $(this).serializeArray();
         params.push({name:'fav', value:'fav'});
         
         $.post($(this).attr('action'), $(this).serialize(), function(response){
           console.log(response);
+          if(response.error){
+            $('#loader').hide();
+            $res.text('Please select all input filters and resubmit...');
+            return;
+          }
           
           var fav = $("<button/>").addClass('btn btn-primary').text('Favorite');
+          fav.attr('id', 'favbtn');
           fav.click( function(d){
             $.ajax({
               type: 'POST',
@@ -380,28 +408,9 @@ block footer
           
           $('#sub_id').append(fav);
           
-          var ds = $sel[0].value;
-          
-          switch(ds){
-            case 'OCC_BY_STATE':
-              makeTable($res, response);
-              $restbl.show();
-              break;
-            case 'DECLINE_JOBS':
-              makeTable($res, response);
-              $restbl.show();
-              break;
-            case 'HIGHEST_PAID_YEAR':
-              makeTable($res, response);
-              $restbl.show();
-              break;
-            case 'OCC_BY_EDU':
-              makeTable($res, response);
-              $restbl.show();
-              break;
-            default:
-              console.log('default', response);
-          }
+          makeTable($res, response);
+          $restbl.show();
+          $('#loader').hide();
         },'json');
         return false;
       });
@@ -447,6 +456,35 @@ block footer
             clear_hide($minsal); 
             clear_hide($maxsal);
             break;
+          case 'TOT_EMP_NATION':
+            clear_hide($edu);
+            clear_hide($state)		
+            clear_hide($year); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          case 'TOT_EMP_STATE':
+            clear_hide($edu);		
+            clear_hide($year); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          case 'EMP_STATE_DIST':
+            clear_hide($edu);
+            clear_hide($occ)			
+            clear_hide($year); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          case 'DEGREE_DIST':
+            clear_hide($occ)	
+            clear_hide($edu)	
+            clear_hide($state)			
+            clear_hide($year); 
+            clear_hide($minsal); 
+            clear_hide($maxsal);
+            break;
+          
 			
           default:
             console.log('default');

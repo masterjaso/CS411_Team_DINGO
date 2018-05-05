@@ -102,7 +102,22 @@ router.post('/', async function(req, res, next){
       case 'OCC_BY_EDU':
         args = [b.edu];
         [rows, fields] = await conn.execute(q.OCC_BY_EDU, args);
-        console.log(b.edu);
+        break;
+      case 'TOT_EMP_NATION':
+        args = [b.occ];
+        [rows, fields] = await conn.execute(q.TOT_EMP_NATION, args);
+        break;
+      case 'TOT_EMP_STATE':
+        args = [b.occ, b.state];
+        [rows, fields] = await conn.execute(q.TOT_EMP_STATE, args);
+        break;
+      case 'EMP_STATE_DIST':
+        args = [b.state, b.state];
+        [rows, fields] = await conn.execute(q.EMP_STATE_DIST, args);
+        break;
+      case 'DEGREE_DIST':
+        args = [];
+        [rows, fields] = await conn.execute(q.DEGREE_DIST, args);
         break;
       default:
         console.log('No Data Set Selected');
@@ -111,7 +126,14 @@ router.post('/', async function(req, res, next){
     k = rows;
     conn.end();
   }
-  catch(e){console.log(e);}
+  catch(e){
+    console.log(e);
+    console.log(e.message);
+    
+    if(e.message == 'Bind parameters must not contain undefined. To pass SQL NULL specify JS null'){
+      res.json({error: 'Please select all parameters'});
+    }
+  }
   
   res.json(k);
 });
