@@ -7,8 +7,8 @@ module.exports = {
                 "SET firstname = ?, lastname=?, stateID=?, eduLevelID=?, " +
                 "OCC_CODE=?, companyEmp=?, salary=? " +
                 "WHERE userID=?;",
-  OCC_BY_STATE: "Select DISTINCT OCC_TITLE from OCC_STATS " +
-                "WHERE OCC_CODE not like '%0000%' AND YEAR_ID LIKE ?  AND STATE_ID LIKE ?;",
+  OCC_BY_STATE: "Select OCC_TITLE as JobTitle,  TOT_EMP as Employed, A_MEAN as AnnualMeanSalary from OCC_STATS " +
+                "WHERE OCC_CODE not like '%0000%' AND YEAR_ID LIKE ?  AND STATE_ID LIKE ? ORDER BY TOT_EMP DESC;",
   ADD_FAV:  "INSERT INTO dingo.Favorites (userID, queryData) VALUES (?, ?);",
   GET_FAV:  "SELECT favID, queryData FROM dingo.Favorites WHERE userID = ?;",
   DEL_FAV:  "DELETE FROM dingo.Favorites WHERE favID = ?;",
