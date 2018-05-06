@@ -8,9 +8,12 @@ html(language='en')
     
     link(rel='shortcut icon', href='/images/favicon.png', type='image/x-icon')
     
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
-    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
+    link(rel='stylesheet' type='text/css' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet' type='text/css' href='https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css')
+    
+    script(src="https://code.jquery.com/jquery-3.3.1.min.js")
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script(src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js")
     
     block header
   body
@@ -44,12 +47,9 @@ html(language='en')
                 li.divider(role="separator")
                 li
                   a(href="/logout") Log Out
-          form.navbar-form.navbar-left
-            .form-group
-              input.form-control(type="text" placeholder="Search")
-            button.btn.btn-default(type="submit") Submit
           
-    div.container
+          
+    div.container-fluid
       block content
   
   footer
