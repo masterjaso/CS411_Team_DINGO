@@ -309,10 +309,13 @@ block content
 
     div#loader.loader(hidden)
     div#res.container
+    div#chart.container
     
     
 block footer
   script.
+    let draw = false;
+    
     function clear_hide(obj){
       o = obj[0];
       o.value = '';
@@ -327,6 +330,117 @@ block footer
             return;
         }
       }
+    }
+    
+    function getTableData(table) {
+      const dataArray = [], idArray = [], metricArray = [];
+     
+      // loop table rows
+      table.rows({ search: "applied" }).every(function() {
+        console.log(this.data);
+        const data = this.data();
+        idArray.push(data[0]);
+        metricArray.push(parseInt(data[1].replace(/\,/g, "")));
+      });
+     
+      // store all data in dataArray
+      dataArray.push(idArray, metricArray);
+     
+      return dataArray;
+    }
+    
+    function createHighcharts(data) {
+      console.log(data);
+      Highcharts.setOptions({
+        lang: { thousandsSep: "," }
+      });
+     
+      Highcharts.chart("chart", {
+        title: { text: "Results" },
+        //subtitle: { text: "Sub-Title" },
+        xAxis: [
+          {
+            categories: data[0],
+            labels: { rotation: -45 }
+          }
+        ],
+        yAxis: [
+          {
+            // first yaxis
+            title: { text: "Values" }
+          },
+          /*  Uncomment this, or add something similar if you want to y-Value sets
+          {
+            // secondary yaxis
+            title: {
+              text: "Y-Label-Secondary"
+            },
+            min: 0,
+            opposite: true
+          }
+          */
+        ],
+        series: [
+          {
+            name: "Element",
+            color: "#0071A7",
+            type: "column",
+            data: data[1],
+            tooltip: {
+              //valueSuffix: " M"
+            }
+          },
+          /*  Uncomment this, or add something similar if you want to y-Value sets
+          {
+            name: "Density (P/Km²)",
+            color: "#FF404E",
+            type: "spline",
+            data: data[2],
+            yAxis: 1
+          }
+          */
+        ],
+        tooltip: {
+          shared: true
+        },
+        legend: {
+          backgroundColor: "#ececec",
+          shadow: true
+        },
+        credits: {
+          enabled: false
+        },
+        noData: {
+          style: {
+            fontSize: "16px"
+          }
+        }
+      });
+    }
+    
+    function setTableEvents(table) {
+      // listen for page clicks
+      table.on("page", () => {
+        draw = true;
+      });
+     
+      // listen for updates and adjust the chart accordingly
+      table.on("draw", () => {
+        if (draw) {
+          draw = false;
+        } else {
+          const tableData = getTableData(table);
+          createHighcharts(tableData);
+        }
+      });
+    }
+    
+    function buildChart() {
+      const table = $('.dataTable').DataTable();
+      console.log(table);
+      const tableData = getTableData(table);
+      createHighcharts(tableData);
+      setTableEvents(table);
     }
     
     function makeTable(container, data) {
@@ -359,9 +473,16 @@ block footer
       });
       
       container.append(table);
-      table.DataTable({
-      });
-      container.append(table);
+      console.log('before DT');
+      table.DataTable({});
+      console.log('after DT');
+      //table.DataTable({
+      //  initComplete: function(){
+      //    console.log($('.dataTable'));
+      //    buildChart();
+      //  }
+      //});
+      
     }
     
     $(document).ready(function(){
@@ -375,12 +496,14 @@ block footer
       var $maxsal = $('#maxsal');
       var $restbl = $('#restbl');
       var $res = $('#res');
+      var $chart = $('#chart');
       var $subbtn = $('#subbtn');
       var qString;
       
       $form.submit(function(){
         $('#loader').show();
         $res.empty();
+        $chart.empty();
         $('#favbtn').remove();
         var params = $(this).serializeArray();
         params.push({name:'fav', value:'fav'});
@@ -411,6 +534,9 @@ block footer
           makeTable($res, response);
           $restbl.show();
           $('#loader').hide();
+          console.log('before bc');
+          buildChart();
+          console.log('after bc');
         },'json');
         return false;
       });

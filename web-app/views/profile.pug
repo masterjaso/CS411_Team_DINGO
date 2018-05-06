@@ -338,8 +338,8 @@ block content
         tbody
             tr
               td(data-title='Studio') 
-              td(data-title='Studio') <abbr title="Your current salary ranking is determined based off the Mean Natiowide Salary. This ratio indicates your salary difference.">#{(((currentSal/mean_sal)*100) - 100).toFixed(2)}% </abbr>
-              td(data-title='Studio') <abbr title="Your current salary ranking is determined based off the Mean Salary of YOUR State. This ratio indicates your salary difference.">#{(((currentSal/sal_state)*100) - 100).toFixed(2)}% </abbr>
+              td(data-title='Studio') <abbr title="Your current salary ranking is determined based off the Mean Natiowide Salary. This ratio indicates your salary difference.">#{(((currentSal/mean_sal)*100)-100).toFixed(2)}% </abbr>
+              td(data-title='Studio') <abbr title="Your current salary ranking is determined based off the Mean Salary of YOUR State. This ratio indicates your salary difference.">#{(((currentSal/sal_state)*100)-100).toFixed(2)}% </abbr>
               td(data-title='Studio') #{user_state}
               td(data-title='Studio') <abbr title="Average Educational Level for Your Occupation in Your State.">#{edu_level} </abbr>
               td(data-title='Studio') #{(parseFloat(tot_emp_state)).toFixed(0)}

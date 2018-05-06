@@ -68,12 +68,12 @@ block content
       new Chart(document.getElementById("bar-chart"), {
         type: 'bar',
         data: {
-          labels: [data[0]['OCC_TITLE'], data[1]['OCC_TITLE'], data[2]['OCC_TITLE'], data[3]['OCC_TITLE'],],
+          labels: [data[3]['OCC_TITLE'], data[0]['OCC_TITLE'], data[1]['OCC_TITLE'], data[2]['OCC_TITLE']],
           datasets: [
             {
               label: "Employed",
               backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-              data: [data[0]['TOT_EMP'], data[1]['TOT_EMP'], data[2]['TOT_EMP'], data[3]['TOT_EMP']]
+              data: [data[3]['TOT_EMP'], data[0]['TOT_EMP'], data[1]['TOT_EMP'], data[2]['TOT_EMP']]
             }
           ]
         },
@@ -125,8 +125,8 @@ block content
             borderColor: "#e8c3b9",
             fill: false
           }, { 
-            data: [data[12]['SUM'], data[13]['SUM'], data[14]['SUM']],
-            label: "California",
+            data: [data[15]['SUM'], data[16]['SUM'], data[17]['SUM']],
+            label: "Colorodo",
             borderColor: "#c45850",
             fill: false
           }
@@ -135,7 +135,7 @@ block content
       options: {
         title: {
           display: true,
-          text: 'Employment timeline data in various states from 2014 - 2016 (in millions)'
+          text: 'Employment timeline data in various states from 2014 - 2016'
         }
       }
     });
