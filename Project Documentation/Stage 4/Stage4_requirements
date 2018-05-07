@@ -1,0 +1,24 @@
+Stage 4: Initial Demo (7%)
+
+Due: Sunday of week 12
+
+In stage 4, each group must do the following:
+
+Record an initial demo video of its application in its initial working status. The initial demo video should take about 10 minutes. Read the initial demo requirements section below for the requirements of this demo.
+The initial demo video should be uploaded to Illinois Media Space at https://mediaspace.illinois.edu by the team captain. After the video is uploaded to Media Space, there will be a shareable link to the video. For details on how to upload videos to Media Space, refer to the final project template.
+Submit the link to the initial demo video to Coursera
+Initial Demo Requirements: Each group needs to demonstrate all of the following using web page or mobile app interface connected with SQL queries. We won't accept the basic queries directly written in cPanel/SQL editor.
+
+Have all the data you need in your database and it should be enough to demo the basic functionality (other requirements for this stage).
+Functionality:
+Show how to insert records to the database - This can be the sign up and update profile functionality
+Show at least one query that searches the database and list or print the returned records - Our home page lists returned simple queries and also displays them as graphs
+Show how to update records - profile page
+Show how to delete records - NEED TO WORK ON THIS
+NOTE: This should not be your page login information (insert username/delete etc). We want to see some actual records from your project updates, else you will get no credits.
+Talk about your plan for the next stage of the project, including what advanced functions do you plan to support. Having a clear idea about advanced functions is very important. Please, make sure you can articulate the challenge clearly.
+Submission Instructions
+
++ TALK ABOUT ADVANCED FUNCTIONS
+
+The team captain will submit the initial video link on Coursera.

@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/', 
   passport.authenticate('login', { 
-    successRedirect: '/',
+    successRedirect: '/profile',
     failureRedirect: '/login',
     failureFlash: true })
 );

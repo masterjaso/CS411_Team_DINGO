@@ -12,6 +12,7 @@ var session = require('express-session');
 var mysql = require('mysql2');
 var MySQLStore = require('express-mysql-session')(session);
 var flash = require('connect-flash');
+var Query = require('./libs/Query');
 
 process.env.IP = require('./libs/addy');
 process.env.PORT = 8000;
@@ -21,13 +22,15 @@ var app = express();
 
 //Setup application database
 var options = {
-    host: 'localhost',
-    port: 3306,
-    user: 'dingosql',
-    password: 'dingopass',
-    database: 'dingo'
+  connectionLimit: 10,
+  host: 'sp18-cs411-dso-009.cs.illinois.edu',
+  port: 3306,
+  user: 'remote',
+  password: 'dingo1',
+  database: 'dingo'
 };
-var db = mysql.createConnection(options);
+var db = mysql.createPool(options);
+var queryRunner = new Query(options);
 var sessionStore = new MySQLStore(options);
 
 //Setup passport user verification
@@ -51,47 +54,50 @@ passport.use(
   function(req, username, password, done) {
     // find a user who is the same as the forms
     // we are checking to see if the user trying to login already exists
-    db.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows) {
-      if (err){ return done(err); }
-      
-      //If userID already exists alert user
-      if (rows.length) {
-        return done(null, false, req.flash('msg', 'That username is already taken.'));
-      } 
-      
-      else {
-        // if there is no user with that username
-        // create the user and insert into database
-        var insertQuery = "INSERT INTO User ( userID, firstname, lastname, passwd, " +
-                                             "stateID, eduLevelID, OCC_CODE, companyEmp, " +
-                                             "salary, reg_date) values ?";
+    db.getConnection(function(err, conn) {
+      conn.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows) {
+        conn.release();
+        if (err){ return done(err); }
         
-        //Capture registration date
-        var regDate = new Date()
-        regDate.setHours(0,0,0,0);
-        regDate = regDate.toISOString()
+        //If userID already exists alert user
+        if (rows.length) {
+          return done(null, false, req.flash('msg', 'That username is already taken.'));
+        } 
         
-        //Setup new User Entry
-        var userEntry = [
-          [
-          req.body.username,
-          req.body.fname,
-          req.body.lname,
-          bcrypt.hashSync( req.body.password, 10),
-          req.body.state,
-          req.body.education,
-          req.body.job,
-          req.body.company,
-          parseInt( req.body.salary.replace(/[$,]+/g,"") ),
-          regDate,
-          ]
-        ];
-        
-        db.query(insertQuery,[userEntry],function(err, rows) {
-          if(err) console.log('ERROR',err);
-          return done(null, req.body.username);
-        });
-      }
+        else {
+          // if there is no user with that username
+          // create the user and insert into database
+          var insertQuery = "INSERT INTO User ( userID, firstname, lastname, passwd, " +
+                                               "stateID, eduLevelID, OCC_CODE, companyEmp, " +
+                                               "salary, reg_date) values ?";
+          
+          //Capture registration date
+          var regDate = new Date()
+          regDate.setHours(0,0,0,0);
+          regDate = regDate.toISOString()
+          
+          //Setup new User Entry
+          var userEntry = [
+            [
+            req.body.username,
+            req.body.fname,
+            req.body.lname,
+            bcrypt.hashSync( req.body.password, 10),
+            req.body.state,
+            req.body.education,
+            req.body.job,
+            req.body.company,
+            parseInt( req.body.salary.replace(/[$,]+/g,"") ),
+            regDate,
+            ]
+          ];
+          
+          db.query(insertQuery,[userEntry],function(err, rows) {
+            if(err) console.log('ERROR',err);
+            return done(null, req.body.username);
+          });
+        }
+      });
     });
   })
 );
@@ -104,20 +110,23 @@ passport.use(
     passReqToCallback : true // allows us to pass back the entire request to the callback
   },
   function(req, username, password, done) { // callback with email and password from our form
-    db.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows){
-      if (err)
-          return done(err);
-      if (!rows.length) {
-          return done(null, false, req.flash('msg', 'Invalid signin, retry or go to signup to register!')); // req.flash is the way to set flashdata using connect-flash
-      }
-      
-      // if the user is found but the password is wrong
-      if (!bcrypt.compareSync(password, rows[0].password)){
-          
-          return done(null, false, req.flash('msg', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
-      }
-      // all is well, return successful user
-      return done(null, rows[0]);
+    db.getConnection(function(err, conn) {
+      conn.query("SELECT * FROM User WHERE userID = ?",[username], function(err, rows){
+        conn.release();
+        if (err)
+            return done(err);
+        if (!rows.length) {
+            return done(null, false, req.flash('msg', 'Invalid signin, retry or go to signup to register!')); // req.flash is the way to set flashdata using connect-flash
+        }
+        
+        // if the user is found but the password is wrong
+        if (!bcrypt.compareSync(password, rows[0].passwd)){
+            
+            return done(null, false, req.flash('msg', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+        }
+        // all is well, return successful user
+        return done(null, rows[0]);
+      });
     });
   })
 );
@@ -150,6 +159,8 @@ app.use('*', loggedIn, function(req, res, next){
   req.flashMsg = req.flash('msg').pop();
   
   req.dbOpt = options;
+  req.pool = db;
+  req.q = queryRunner;
   //console.log(Object.keys(req));
   //console.log(req.session);
   //console.log(req.passport);
@@ -161,12 +172,14 @@ var index = require('./routes/index');
 var profile = require('./routes/profile');
 var login = require('./routes/login');
 var signup = require('./routes/signup');
+var explore = require('./routes/explore');
 
 //Invoke routes
 app.use('/', index);
 app.use('/profile', profile);
 app.use('/login', login);
 app.use('/signup', signup);
+app.use('/explore', explore);
 
 //Logout function
 app.get('/logout', function(req, res){

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../app.js').passport;
 const mysql = require('mysql2/promise');
+const q = require('../libs/SQL-Queries');
 
 router.get('/', async function(req, res, next){
   let conn, k;
@@ -13,8 +14,7 @@ router.get('/', async function(req, res, next){
     conn = await mysql.createConnection(req.dbOpt);
     
     //Get Occupation List
-    let [rows, fields] = await conn.execute("SELECT * FROM dingo.OCCUPATION " +
-                              "WHERE OCC_CODE NOT LIKE '%-0000%';", []);
+    let [rows, fields] = await conn.execute(q.OCC_LIST, []);
     
     k = rows;
     
@@ -23,8 +23,7 @@ router.get('/', async function(req, res, next){
     }
     
     //Get Education List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.EDUCATIONALLEVEL " +
-                              "WHERE EDUCATIONLEVELID <> 'UNDT';", []);
+    [rows, fields] = await conn.execute(q.EDU_LIST, []);
     
     k = rows;
     
@@ -34,7 +33,7 @@ router.get('/', async function(req, res, next){
     
     
     //Get States List
-    [rows, fields] = await conn.execute("SELECT * FROM dingo.STATE;", []);
+    [rows, fields] = await conn.execute(q.STATE_LIST, []);
     k = rows;
     
     for(var i = 0; i < k.length; i++){
